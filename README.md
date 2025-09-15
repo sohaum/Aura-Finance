@@ -49,3 +49,25 @@ OPENAI_API_KEY="sk-your-openai-api-key-here"
 # Optional: Other AI services
 # ANTHROPIC_API_KEY="your-anthropic-key"
 # GEMINI_API_KEY="your-gemini-key"
+
+// src/app/sign-in/page.js
+"use client";
+
+import { signIn } from "next-auth/react";
+
+export default function SignInPage() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-100">
+      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
+        <h1 className="text-2xl font-bold mb-6 text-center">Sign In</h1>
+        <button
+          onClick={() => signIn("google")}
+          className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Continue with Google
+        </button>
+      </div>
+    </div>
+  );
+}
+
