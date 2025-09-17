@@ -152,8 +152,10 @@ export default function Dashboard() {
         
         <Link href="/add-expense">
           <Button className="bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-            <PlusCircle className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-            Add Expense
+            <div className="flex flex-row">
+              <PlusCircle className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+              Add Expense
+            </div>
           </Button>
         </Link>
       </div>
