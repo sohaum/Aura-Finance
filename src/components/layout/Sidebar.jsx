@@ -64,7 +64,7 @@ export default function Sidebar() {
         <ul className="space-y-2">
           {navigationItems.map((item) => (
             <li key={item.title}>
-              <Link href__={item.url}>
+              <Link href={item.url}>
                 <div className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/60 transition-all duration-300 group hover:transform hover:scale-[1.01] ${pathname === item.url ? 'bg-white/80 shadow-lg transform scale-[1.02]' : ''}`}>
                   <item.icon className={`w-5 h-5 ${item.color} group-hover:scale-110 transition-transform`} />
                   <span className="font-medium text-slate-700">{item.title}</span>
@@ -101,12 +101,12 @@ export default function Sidebar() {
             </Button>
           </div>
         ) : (
-          <a href__="/api/auth/signin/google">
+          <Link href="/sign-in">
             <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg">
               <LogIn className="w-4 h-4 mr-2" />
               Sign In
             </Button>
-          </a>
+          </Link>
         )}
       </div>
     </aside>

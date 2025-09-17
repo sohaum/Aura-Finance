@@ -1,6 +1,7 @@
+"use client"
+
 import React, { useState, useEffect } from "react";
-import { Expense, User } from "@/entities/all";
-import { InvokeLLM } from "@/integrations/Core";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

@@ -1,7 +1,8 @@
+"use client"
+
 import React, { useState, useEffect } from "react";
-import { Expense, User } from "@/entities/all";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { 
   DollarSign, 
   TrendingUp, 
@@ -12,41 +13,57 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { formatCurrency } from "@/lib/utils";
 
-import MetricCard from "../components/dashboard/MetricCard";
-import ExpenseChart from "../components/dashboard/ExpenseChart";
-import CategoryChart from "../components/dashboard/CategoryChart";
-import RecentExpenses from "../components/dashboard/RecentExpenses";
+import MetricCard from "@/components/dashboard/MetricCard";
+import ExpenseChart from "@/components/dashboard/ExpenseChart";
+import CategoryChart from "@/components/dashboard/CategoryChart";
+import RecentExpenses from "@/components/dashboard/RecentExpenses";
 
 export default function Dashboard() {
+  const { data: session, status } = useSession();
   const [expenses, setExpenses] = useState([]);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const userData = await User.me();
-        setUser(userData);
-        
-        const expenseData = await Expense.filter(
-          { created_by: userData.email }, 
-          '-created_date', 
-          100
-        );
-        setExpenses(expenseData);
+        const response = await fetch('/api/expenses');
+        if (!response.ok) throw new Error('Failed to fetch expenses');
+        const data = await response.json();
+        setExpenses(data);
       } catch (error) {
         console.error("Error loading data:", error);
-        // If user not authenticated, redirect to login
-        if (error.message?.includes('not authenticated')) {
-          User.login();
-        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    loadData();
-  }, []);
+    if (status === "authenticated") {
+      loadData();
+    } else if (status === "unauthenticated") {
+      setLoading(false);
+    }
+  }, [status]);
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-lg text-gray-600 mb-4">Please sign in to view your dashboard</p>
+        <Link href="/sign-in">
+          <Button>Sign In</Button>
+        </Link>
+      </div>
+    );
+  }
 
   // Calculate metrics
   const today = new Date();
@@ -94,7 +111,7 @@ export default function Dashboard() {
 
   const recentExpenses = expenses.slice(0, 5);
 
-  if (loading) {
+  if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
@@ -102,18 +119,19 @@ export default function Dashboard() {
     );
   }
 
-  if (!user) {
+  if (!session) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold gradient-text mb-4">Welcome to ExpenseTracker</h1>
           <p className="text-slate-600 mb-8 text-lg">Smart insights for your financial journey</p>
-          <Button
-            onClick={() => User.login()}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            Get Started
-          </Button>
+          <Link href="/sign-in">
+            <Button
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Get Started
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -125,14 +143,14 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Welcome back, {user.full_name?.split(' ')[0] || 'there'}! 👋
+            Welcome back, {session?.user?.name?.split(' ')[0] || 'there'}! 👋
           </h1>
           <p className="text-slate-600">
             Here's your financial overview for {format(today, 'MMMM yyyy')}
           </p>
         </div>
         
-        <Link to={createPageUrl("AddExpense")}>
+        <Link href="/add-expense">
           <Button className="bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
             <PlusCircle className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
             Add Expense
@@ -144,7 +162,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <MetricCard
           title="This Week"
-          value={`$${totalThisWeek.toFixed(2)}`}
+          value={formatCurrency(totalThisWeek)}
           change="12% vs last week"
           changeType="increase"
           icon={Calendar}
@@ -153,7 +171,7 @@ export default function Dashboard() {
         />
         <MetricCard
           title="This Month"
-          value={`$${totalThisMonth.toFixed(2)}`}
+          value={formatCurrency(totalThisMonth)}
           change="8% vs last month"
           changeType="increase"
           icon={DollarSign}
@@ -162,7 +180,7 @@ export default function Dashboard() {
         />
         <MetricCard
           title="Daily Average"
-          value={`$${averageDaily.toFixed(2)}`}
+          value={formatCurrency(averageDaily)}
           icon={TrendingUp}
           gradient="bg-gradient-to-r from-purple-500 to-purple-600"
           delay={0.2}
@@ -194,14 +212,14 @@ export default function Dashboard() {
           <div className="glass-card p-6 rounded-xl">
             <h3 className="font-bold text-slate-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Link to={createPageUrl("AddExpense")}>
+              <Link href="/add-expense">
                 <Button variant="outline" className="w-full justify-start group hover:bg-white/60">
                   <PlusCircle className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" />
                   Add New Expense
                   <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link to={createPageUrl("Analytics")}>
+              <Link href="/analytics">
                 <Button variant="outline" className="w-full justify-start group hover:bg-white/60">
                   <TrendingUp className="w-4 h-4 mr-2" />
                   View Analytics
@@ -220,7 +238,7 @@ export default function Dashboard() {
               <p className="text-slate-600 text-sm mb-4">
                 Add your first expense to see personalized insights and analytics.
               </p>
-              <Link to={createPageUrl("AddExpense")}>
+              <Link href="/add-expense">
                 <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                   Add First Expense
                 </Button>

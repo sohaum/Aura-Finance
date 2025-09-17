@@ -83,7 +83,10 @@ export default function RecentExpenses({ expenses }) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-slate-900">${expense.amount.toFixed(2)}</p>
+                      <p className="font-bold text-slate-900">₹{expense.amount.toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })}</p>
                       <Badge className={`text-xs ${categoryColors[expense.category]}`}>
                         {expense.category}
                       </Badge>

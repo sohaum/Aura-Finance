@@ -10,7 +10,7 @@ export default function ExpenseChart({ data, title = "Spending Trend" }) {
         <div className="glass-card p-3 rounded-lg shadow-lg">
           <p className="font-medium text-slate-900">{label}</p>
           <p className="text-blue-600 font-semibold">
-            ${payload[0].value.toFixed(2)}
+            {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(payload[0].value)}
           </p>
         </div>
       );

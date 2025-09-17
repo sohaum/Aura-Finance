@@ -4,18 +4,18 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { motion } from "framer-motion";
 
 const CATEGORY_COLORS = {
-  food: '#FF6B6B',
-  transportation: '#4ECDC4',
-  shopping: '#45B7D1',
-  entertainment: '#96CEB4',
-  bills: '#FFEAA7',
-  healthcare: '#DDA0DD',
-  education: '#98D8C8',
-  travel: '#F7DC6F',
-  groceries: '#BB8FCE',
-  fitness: '#85C1E9',
-  subscriptions: '#F8C471',
-  other: '#AED6F1'
+  food: '#FF6B6B',        // Coral Red
+  transportation: '#4ECDC4', // Turquoise
+  shopping: '#9B59B6',    // Purple
+  entertainment: '#2ECC71', // Emerald Green
+  bills: '#F1C40F',      // Yellow
+  healthcare: '#FF69B4',  // Hot Pink
+  education: '#3498DB',   // Blue
+  travel: '#E67E22',     // Orange
+  groceries: '#27AE60',  // Nephritis Green
+  fitness: '#00CED1',    // Dark Turquoise
+  subscriptions: '#FFA07A', // Light Salmon
+  other: '#95A5A6'       // Gray
 };
 
 export default function CategoryChart({ data, title = "Spending by Category" }) {
@@ -25,7 +25,7 @@ export default function CategoryChart({ data, title = "Spending by Category" }) 
         <div className="glass-card p-3 rounded-lg shadow-lg">
           <p className="font-medium text-slate-900 capitalize">{payload[0].payload.category}</p>
           <p className="text-blue-600 font-semibold">
-            ${payload[0].value.toFixed(2)}
+            {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(payload[0].value)}
           </p>
         </div>
       );

@@ -1,7 +1,8 @@
+"use client"
+
 import React, { useState } from "react";
-import { Expense, User } from "@/entities/all";
-import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, Plus, X, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
+import { formatCurrency } from "@/lib/utils";
 
 const CATEGORIES = [
   { value: "food", label: "Food & Dining", color: "bg-red-100 text-red-800" },
@@ -37,9 +39,9 @@ const PAYMENT_METHODS = [
 ];
 
 export default function AddExpense() {
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
   const [newTag, setNewTag] = useState("");
   
   const [formData, setFormData] = useState({
@@ -53,18 +55,6 @@ export default function AddExpense() {
     is_recurring: false,
     tags: []
   });
-
-  React.useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const userData = await User.me();
-        setUser(userData);
-      } catch (error) {
-        User.login();
-      }
-    };
-    loadUser();
-  }, []);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -92,20 +82,60 @@ export default function AddExpense() {
     setLoading(true);
 
     try {
-      await Expense.create({
-        ...formData,
-        amount: parseFloat(formData.amount)
+      // Validate required fields
+      if (!formData.title || !formData.amount || !formData.category || !formData.date) {
+        throw new Error("Please fill in all required fields");
+      }
+
+      const expenseData = {
+        title: formData.title,
+        amount: parseFloat(formData.amount),
+        category: formData.category,
+        date: formData.date,
+      };
+
+      // Only add optional fields if they have values
+      if (formData.notes) expenseData.notes = formData.notes;
+      if (formData.location) expenseData.location = formData.location;
+      if (formData.payment_method) expenseData.paymentMethod = formData.payment_method;
+      if (formData.tags.length > 0) expenseData.tags = formData.tags;
+      if (formData.is_recurring) expenseData.isRecurring = formData.is_recurring;
+
+      const response = await fetch('/api/expenses/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(expenseData),
       });
-      
-      navigate(createPageUrl("Dashboard"));
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create expense");
+      }
+
+      router.push('/dashboard');
     } catch (error) {
       console.error("Error creating expense:", error);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const selectedCategory = CATEGORIES.find(cat => cat.value === formData.category);
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    router.push('/sign-in');
+    return null;
+  }
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
@@ -119,7 +149,7 @@ export default function AddExpense() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigate(createPageUrl("Dashboard"))}
+            onClick={() => router.push('/dashboard')}
             className="glass-card hover:bg-white/60"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -157,7 +187,7 @@ export default function AddExpense() {
                       <Label htmlFor="amount">Amount *</Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 font-semibold">
-                          $
+                          ₹
                         </span>
                         <Input
                           id="amount"
@@ -314,7 +344,7 @@ export default function AddExpense() {
                 <CardContent className="space-y-4">
                   <div className="text-center p-4 border-2 border-dashed border-slate-200 rounded-lg">
                     <div className="text-3xl font-bold text-slate-900 mb-1">
-                      ${formData.amount || '0.00'}
+                      {formatCurrency(formData.amount || 0)}
                     </div>
                     <div className="text-slate-600">
                       {formData.title || 'Expense title'}
@@ -357,7 +387,7 @@ export default function AddExpense() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate(createPageUrl("Dashboard"))}
+                  onClick={() => router.push('/dashboard')}
                   className="w-full glass-card hover:bg-white/60"
                 >
                   Cancel

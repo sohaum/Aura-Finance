@@ -5,19 +5,24 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Create sample user (for development)
+  const hashedPassword = await hash('demo1234', 12);
+  
   const user = await prisma.user.upsert({
     where: { email: 'demo@example.com' },
-    update: {},
+    update: {
+      password: hashedPassword
+    },
     create: {
       email: 'demo@example.com',
       name: 'Demo User',
+      password: hashedPassword,
       expenses: {
         create: [
           {
             title: 'Morning Coffee',
             amount: 4.50,
             category: 'FOOD',
-            date: new Date('2024-12-16'),
+            date: new Date('2025-09-17'),
             paymentMethod: 'CREDIT_CARD',
             location: 'Starbucks',
             notes: 'Daily caffeine fix',
@@ -27,7 +32,7 @@ async function main() {
             title: 'Grocery Shopping',
             amount: 67.89,
             category: 'GROCERIES',
-            date: new Date('2024-12-15'),
+            date: new Date('2025-09-16'),
             paymentMethod: 'DEBIT_CARD',
             location: 'Whole Foods',
             notes: 'Weekly groceries',
@@ -37,7 +42,7 @@ async function main() {
             title: 'Uber to Airport',
             amount: 35.20,
             category: 'TRANSPORTATION',
-            date: new Date('2024-12-14'),
+            date: new Date('2025-09-15'),
             paymentMethod: 'DIGITAL_WALLET',
             location: 'Los Angeles',
             notes: 'Business trip',
@@ -47,7 +52,7 @@ async function main() {
             title: 'Netflix Subscription',
             amount: 15.99,
             category: 'SUBSCRIPTIONS',
-            date: new Date('2024-12-13'),
+            date: new Date('2025-09-14'),
             paymentMethod: 'CREDIT_CARD',
             notes: 'Monthly subscription',
             isRecurring: true,

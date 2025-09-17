@@ -1,3 +1,7 @@
+Sign in using the demo account:
+Email: demo@example.com
+Password: demo1234
+
 # Core dependencies
 npm install @radix-ui/react-* # for shadcn components
 npm install lucide-react framer-motion

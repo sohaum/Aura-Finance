@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Wallet, BarChart3, Brain, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const features = [
   {
@@ -46,11 +47,11 @@ export default async function LandingPage() {
           <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
             ExpenseTracker gives you the tools and AI-powered insights to take control of your finances like never before.
           </p>
-          <a href__="/api/auth/signin/google">
+          <Link href="/sign-in">
             <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-7 text-lg shadow-lg hover:shadow-xl transition-all duration-300 group">
               Get Started for Free <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-          </a>
+          </Link>
         </div>
 
         <div className="mt-20 grid md:grid-cols-3 gap-8 text-left">
