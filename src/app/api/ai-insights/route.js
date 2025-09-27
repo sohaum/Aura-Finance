@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-
+export const runtime = "nodejs";
 // Move the model endpoints to a constant
 const MODEL_ENDPOINTS = [
   "mistralai/Mistral-7B-Instruct-v0.2",
