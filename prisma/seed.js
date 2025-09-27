@@ -73,7 +73,7 @@ async function main() {
     }
   });
 
-  console.log('Database seeded successfully:', user);
+  // console.log('Database seeded successfully:', user);
 }
 
 main()

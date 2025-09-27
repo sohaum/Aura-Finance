@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
-    console.log('POST Session:', JSON.stringify(session, null, 2));
+    // console.log('POST Session:', JSON.stringify(session, null, 2));
     
     if (!session || !session.user || !session.user.id) {
       return new Response(JSON.stringify({ error: "Not authenticated" }), {
@@ -43,14 +43,14 @@ export async function POST(req) {
       userId: session.user.id, // Use session.user.id directly from JWT
     };
 
-    console.log('Creating expense with data:', JSON.stringify(expenseData, null, 2));
+    // console.log('Creating expense with data:', JSON.stringify(expenseData, null, 2));
 
     // Create expense
     const expense = await prisma.expense.create({
       data: expenseData,
     });
 
-    console.log('Created expense:', JSON.stringify(expense, null, 2));
+    // console.log('Created expense:', JSON.stringify(expense, null, 2));
 
     return new Response(JSON.stringify(expense), {
       status: 201,
