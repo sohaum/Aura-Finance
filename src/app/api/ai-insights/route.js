@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
+
 // Move the model endpoints to a constant
 const MODEL_ENDPOINTS = [
   "mistralai/Mistral-7B-Instruct-v0.2",
@@ -18,7 +17,7 @@ function generateFallbackInsights(analysisData) {
     : 0;
 
   return {
-    summary: `You've spent ₹${analysisData.totalExpenses.toFixed(2)} across ${
+    summary: `You've spent $${analysisData.totalExpenses.toFixed(2)} across ${
       analysisData.transactionCount
     } transactions. ${
       monthlyChange >= 0 ? "Your spending increased" : "Your spending decreased"
@@ -141,9 +140,9 @@ export async function POST(req) {
     // Try AI analysis
     const prompt = `Analyze these spending patterns and provide financial advice:
 
-Total: $${analysisData.totalExpenses.toFixed(2)} (${analysisData.transactionCount} transactions)
-This month: $${analysisData.thisMonthSpending.toFixed(2)}
-Last month: $${analysisData.lastMonthSpending.toFixed(2)}
+Total: ₹${analysisData.totalExpenses.toFixed(2)} (${analysisData.transactionCount} transactions)
+This month: ₹${analysisData.thisMonthSpending.toFixed(2)}
+Last month: ₹${analysisData.lastMonthSpending.toFixed(2)}
 Top category: ${analysisData.topCategory}
 
 Categories: ${analysisData.categoryBreakdown
