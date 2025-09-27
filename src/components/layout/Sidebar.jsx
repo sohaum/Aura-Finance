@@ -90,6 +90,8 @@ export default function Sidebar() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
                 {user.image ? (
                   <Image
+                    height={32}
+                    width={32}
                     src={user.image} 
                     alt={user.name || 'User'} 
                     className="w-8 h-8 rounded-full"

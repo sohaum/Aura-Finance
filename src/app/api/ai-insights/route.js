@@ -17,14 +17,14 @@ function generateFallbackInsights(analysisData) {
     : 0;
 
   return {
-    summary: `You've spent $${analysisData.totalExpenses.toFixed(2)} across ${
+    summary: `You've spent ₹${analysisData.totalExpenses.toFixed(2)} across ${
       analysisData.transactionCount
     } transactions. ${
       monthlyChange >= 0 ? "Your spending increased" : "Your spending decreased"
     } by ${Math.abs(changePercent)}% compared to last month.`,
     patterns: [
       `Your top spending category is ${analysisData.topCategory}`,
-      `Average transaction amount is $${analysisData.averageTransaction?.toFixed(2) || '0.00'}`,
+      `Average transaction amount is ₹${analysisData.averageTransaction?.toFixed(2) || '0.00'}`,
       monthlyChange > 0 ? "Spending increased this month" : "Spending decreased this month",
       analysisData.categoryBreakdown?.length > 3
         ? "You have diverse spending across multiple categories"
