@@ -227,7 +227,7 @@ export default function Dashboard() {
           </h1>
           <div className="flex items-center gap-4">
             <p className="text-slate-600">
-              Here's your financial overview for {format(today, "MMMM yyyy")}
+              Here&apos;s your financial overview for {format(today, "MMMM yyyy")}
             </p>
             <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full">
               <AchievementIcon className={`w-4 h-4 ${achievement.color}`} />
@@ -271,7 +271,7 @@ export default function Dashboard() {
                 Monthly Tracking Goal 🎯
               </h3>
               <p className="text-blue-700 text-sm">
-                You've logged {currentProgress} out of {monthlyGoal} expenses
+                You&apos;ve logged {currentProgress} out of {monthlyGoal} expenses
                 this month
               </p>
             </div>
@@ -376,7 +376,7 @@ export default function Dashboard() {
                   Your expense history will appear here
                 </h3>
                 <p className="text-slate-600 mb-6">
-                  Once you add expenses, you'll see your recent transactions,
+                  Once you add expenses, you&apos;ll see your recent transactions,
                   spending patterns, and detailed analytics right here.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">

@@ -13,6 +13,7 @@ import {
   LogIn
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const navigationItems = [
   {
@@ -88,7 +89,7 @@ export default function Sidebar() {
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
                 {user.image ? (
-                  <img 
+                  <Image
                     src={user.image} 
                     alt={user.name || 'User'} 
                     className="w-8 h-8 rounded-full"
