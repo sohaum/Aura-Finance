@@ -3,14 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./db";
-import { JWT } from "next-auth/jwt";
-import { Session, User } from "next-auth";
 import bcrypt from "bcryptjs";
-
-interface ExtendedToken extends JWT {
-  sub?: string;
-  id?: string;
-}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -84,7 +77,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // JWT callback remains the same
     jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id;
@@ -117,7 +109,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
 
-    signIn: async ({ user, account, profile }) => {
+    signIn: async ({ user, account }) => {
       if (account?.provider === "google") {
         // Ensure user exists in DB
         let dbUser = await prisma.user.findUnique({
@@ -136,13 +128,21 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-  },
 
+    redirect: async ({ url, baseUrl }) => {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url;
+      return `${baseUrl}/dashboard`;
+    },
+  },
   session: {
     strategy: "jwt",
   },
   pages: {
     signIn: "/sign-in",
   },
+  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 };
