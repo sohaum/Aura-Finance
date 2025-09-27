@@ -1,4 +1,4 @@
-# AuraFinance
+# Aura Finance
 
 A modern, full-stack expense tracking application built with Next.js 14, featuring smart categorization, analytics, and a beautiful glassmorphism UI design.
 
@@ -265,9 +265,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## 📞 Support
 
 If you encounter any issues or have questions:
-- Create an [Issue](https://github.com/sohaum/Expense-Tracker/issues)
-- Check the [Documentation](https://github.com/sohaum/Expense-Tracker/wiki)
-- Join our [Discussions](https://github.com/sohaum/Expense-Tracker/discussions)
+- Create an [Issue](https://github.com/sohaum/Aura-Finance/issues)
+- Check the [Documentation](https://github.com/sohaum/Aura-Finance/wiki)
+- Join our [Discussions](https://github.com/sohaum/Aura-Finance/discussions)
 
 ---
 
