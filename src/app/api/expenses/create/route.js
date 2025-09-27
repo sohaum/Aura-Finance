@@ -5,29 +5,11 @@ import { prisma } from "@/lib/db";
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
-    console.log('Session:', JSON.stringify(session, null, 2));
+    console.log('POST Session:', JSON.stringify(session, null, 2));
     
-    if (!session || !session.user) {
-      return new Response(JSON.stringify({ error: "Not authenticated", session }), {
+    if (!session || !session.user || !session.user.id) {
+      return new Response(JSON.stringify({ error: "Not authenticated" }), {
         status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // Try to get user by email first
-    const userByEmail = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    console.log('Found user by email:', JSON.stringify(userByEmail, null, 2));
-
-    if (!userByEmail) {
-      return new Response(JSON.stringify({ 
-        error: "User not found", 
-        userEmail: session.user.email,
-        sessionUser: session.user 
-      }), {
-        status: 404,
         headers: { "Content-Type": "application/json" },
       });
     }
@@ -58,11 +40,7 @@ export async function POST(req) {
       paymentMethod: paymentMethod ? paymentMethod.toUpperCase() : null,
       tags: tags || [],
       isRecurring: isRecurring || false,
-      user: {
-        connect: {
-          id: userByEmail.id
-        }
-      },
+      userId: session.user.id, // Use session.user.id directly from JWT
     };
 
     console.log('Creating expense with data:', JSON.stringify(expenseData, null, 2));
@@ -72,13 +50,18 @@ export async function POST(req) {
       data: expenseData,
     });
 
+    console.log('Created expense:', JSON.stringify(expense, null, 2));
+
     return new Response(JSON.stringify(expense), {
-      status: 200,
+      status: 201,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("API Error:", error);
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+    console.error("POST API Error:", error);
+    return new Response(JSON.stringify({ 
+      error: "Internal Server Error", 
+      details: error.message 
+    }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

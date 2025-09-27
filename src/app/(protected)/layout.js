@@ -11,9 +11,13 @@ export default async function ProtectedLayout({ children }) {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 p-8">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-slate-50">
+        <div className="p-4 md:p-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
