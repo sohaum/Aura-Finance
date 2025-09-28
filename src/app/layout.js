@@ -8,8 +8,10 @@ export const metadata = {
   title: "Aura Finance | Smart Financial Insights",
   description: "Track, analyze, and master your spending with AI-powered insights.",
   icons: {
-    icon: "/logo.png"
-  }
+    icon: "/favicon.ico",  
+    shortcut: "/logo.png", 
+    apple: "/logo.png",     // iOS homescreen icon
+  },
 };
 
 export default function RootLayout({ children }) {
