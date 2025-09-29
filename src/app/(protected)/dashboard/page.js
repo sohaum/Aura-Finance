@@ -91,7 +91,7 @@ export default function Dashboard() {
       <div className="flex flex-col items-center justify-center min-h-screen p-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold gradient-text mb-4">
-            Welcome to ExpenseTracker
+            Welcome to AuraFinance
           </h1>
           <p className="text-slate-600 mb-8 text-lg">
             Smart insights for your financial journey

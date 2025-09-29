@@ -153,7 +153,7 @@ export default function SignInPage() {
               <Wallet className="w-8 h-8 text-white" />
             </motion.div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              ExpenseTracker
+              AuraFinance
             </h1>
             <p className="text-slate-600 text-sm mt-2">
               Smart insights for your financial journey

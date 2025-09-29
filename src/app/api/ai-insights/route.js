@@ -1,20 +1,24 @@
+export const dynamic = 'force-dynamic';
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-export const runtime = "nodejs";
+
 // Move the model endpoints to a constant
 const MODEL_ENDPOINTS = [
   "mistralai/Mistral-7B-Instruct-v0.2",
-  "HuggingFaceH4/zephyr-7b-beta", 
+  "HuggingFaceH4/zephyr-7b-beta",
   "google/flan-t5-large",
   "bigscience/bloomz-560m",
 ];
 
 // Helper function to generate fallback insights
 function generateFallbackInsights(analysisData) {
-  const monthlyChange = analysisData.thisMonthSpending - analysisData.lastMonthSpending;
-  const changePercent = analysisData.lastMonthSpending > 0
-    ? ((monthlyChange / analysisData.lastMonthSpending) * 100).toFixed(1)
-    : 0;
+  const monthlyChange =
+    analysisData.thisMonthSpending - analysisData.lastMonthSpending;
+  const changePercent =
+    analysisData.lastMonthSpending > 0
+      ? ((monthlyChange / analysisData.lastMonthSpending) * 100).toFixed(1)
+      : 0;
 
   return {
     summary: `You've spent $${analysisData.totalExpenses.toFixed(2)} across ${
@@ -24,8 +28,12 @@ function generateFallbackInsights(analysisData) {
     } by ${Math.abs(changePercent)}% compared to last month.`,
     patterns: [
       `Your top spending category is ${analysisData.topCategory}`,
-      `Average transaction amount is ₹${analysisData.averageTransaction?.toFixed(2) || '0.00'}`,
-      monthlyChange > 0 ? "Spending increased this month" : "Spending decreased this month",
+      `Average transaction amount is ₹${analysisData.averageTransaction?.toFixed(
+        2
+      ) || "0.00"}`,
+      monthlyChange > 0
+        ? "Spending increased this month"
+        : "Spending decreased this month",
       analysisData.categoryBreakdown?.length > 3
         ? "You have diverse spending across multiple categories"
         : "Your spending is concentrated in few categories",
@@ -41,9 +49,12 @@ function generateFallbackInsights(analysisData) {
       "Set up automatic transfers to your savings account",
       "Use the envelope method for discretionary spending categories",
     ],
-    concerns: monthlyChange > (analysisData.lastMonthSpending * 0.2)
-      ? ["Significant increase in spending this month - review recent purchases"]
-      : [],
+    concerns:
+      monthlyChange > analysisData.lastMonthSpending * 0.2
+        ? [
+            "Significant increase in spending this month - review recent purchases",
+          ]
+        : [],
   };
 }
 
@@ -76,7 +87,7 @@ async function tryAIAnalysis(prompt) {
 
       if (hfRes.ok) {
         const hfData = await hfRes.json();
-        
+
         let text = "";
         if (Array.isArray(hfData) && hfData[0]) {
           text = hfData[0].generated_text || hfData[0].response || "";
@@ -91,7 +102,10 @@ async function tryAIAnalysis(prompt) {
             return JSON.parse(jsonMatch[0]);
           }
         } catch (parseError) {
-          console.warn(`JSON parse failed for model ${model}:`, parseError.message);
+          console.warn(
+            `JSON parse failed for model ${model}:`,
+            parseError.message
+          );
         }
       }
     } catch (error) {
@@ -99,14 +113,29 @@ async function tryAIAnalysis(prompt) {
       continue;
     }
   }
-  
+
   return null;
 }
 
 export async function POST(req) {
+  if (typeof req === "undefined") {
+    return new Response(JSON.stringify({ error: "Invalid request" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
   try {
     // Check authentication first
-    const session = await getServerSession(authOptions);
+    let session;
+    try {
+      session = await getServerSession(authOptions);
+    } catch (error) {
+      console.error("Session error:", error);
+      return new Response(JSON.stringify({ error: "Authentication failed" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     if (!session?.user) {
       return new Response(JSON.stringify({ error: "Not authenticated" }), {
         status: 401,
@@ -117,10 +146,13 @@ export async function POST(req) {
     // Parse and validate request data
     const analysisData = await req.json();
     if (!analysisData?.totalExpenses) {
-      return new Response(JSON.stringify({ error: "Invalid analysis data provided" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "Invalid analysis data provided" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Generate fallback insights first
@@ -128,26 +160,32 @@ export async function POST(req) {
 
     // If no HF API key, return fallback with a note
     if (!process.env.HF_API_KEY) {
-      return new Response(JSON.stringify({
-        ...fallbackInsights,
-        summary: "Basic analysis provided. AI insights require API configuration."
-      }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          ...fallbackInsights,
+          summary:
+            "Basic analysis provided. AI insights require API configuration.",
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Try AI analysis
     const prompt = `Analyze these spending patterns and provide financial advice:
 
-Total: ₹${analysisData.totalExpenses.toFixed(2)} (${analysisData.transactionCount} transactions)
+Total: ₹${analysisData.totalExpenses.toFixed(2)} (${
+      analysisData.transactionCount
+    } transactions)
 This month: ₹${analysisData.thisMonthSpending.toFixed(2)}
 Last month: ₹${analysisData.lastMonthSpending.toFixed(2)}
 Top category: ${analysisData.topCategory}
 
 Categories: ${analysisData.categoryBreakdown
-  ?.map((cat) => `${cat.category}: $${cat.amount.toFixed(2)}`)
-  ?.join(", ") || 'No categories available'}
+      ?.map((cat) => `${cat.category}: ₹${cat.amount.toFixed(2)}`)
+      ?.join(", ") || "No categories available"}
 
 Provide brief financial insights in JSON format:
 {
@@ -159,30 +197,38 @@ Provide brief financial insights in JSON format:
 }`;
 
     const aiInsights = await tryAIAnalysis(prompt);
-    
+
     // Use AI insights if available, otherwise use fallback
     const insights = aiInsights || fallbackInsights;
 
     // Ensure all required fields exist and are properly formatted
     const finalInsights = {
       summary: insights.summary || fallbackInsights.summary,
-      patterns: Array.isArray(insights.patterns) ? insights.patterns : fallbackInsights.patterns,
-      suggestions: Array.isArray(insights.suggestions) ? insights.suggestions : fallbackInsights.suggestions,
-      budgetTips: Array.isArray(insights.budgetTips) ? insights.budgetTips : fallbackInsights.budgetTips,
-      concerns: Array.isArray(insights.concerns) ? insights.concerns : fallbackInsights.concerns,
+      patterns: Array.isArray(insights.patterns)
+        ? insights.patterns
+        : fallbackInsights.patterns,
+      suggestions: Array.isArray(insights.suggestions)
+        ? insights.suggestions
+        : fallbackInsights.suggestions,
+      budgetTips: Array.isArray(insights.budgetTips)
+        ? insights.budgetTips
+        : fallbackInsights.budgetTips,
+      concerns: Array.isArray(insights.concerns)
+        ? insights.concerns
+        : fallbackInsights.concerns,
     };
 
     return new Response(JSON.stringify(finalInsights), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-
   } catch (error) {
     console.error("AI Insights API Error:", error);
 
     // Return a safe fallback response
     const errorFallback = {
-      summary: "Unable to generate insights at this time. Please try again later.",
+      summary:
+        "Unable to generate insights at this time. Please try again later.",
       patterns: ["Manual expense tracking recommended"],
       suggestions: [
         "Review your spending categories regularly",

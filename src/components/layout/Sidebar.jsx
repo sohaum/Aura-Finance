@@ -50,7 +50,7 @@ export default function Sidebar() {
             <Wallet className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="font-bold text-slate-900 text-lg gradient-text">ExpenseTracker</h2>
+            <h2 className="font-bold text-slate-900 text-lg gradient-text">AuraFinance</h2>
             <p className="text-xs text-slate-500">Smart financial insights</p>
           </div>
         </div>
