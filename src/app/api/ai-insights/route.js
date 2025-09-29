@@ -13,24 +13,20 @@ const MODEL_ENDPOINTS = [
 
 // Helper function to generate fallback insights
 function generateFallbackInsights(analysisData) {
-  const monthlyChange =
-    analysisData.thisMonthSpending - analysisData.lastMonthSpending;
-  const changePercent =
-    analysisData.lastMonthSpending > 0
-      ? ((monthlyChange / analysisData.lastMonthSpending) * 100).toFixed(1)
-      : 0;
+  const monthlyChange = analysisData.thisMonthSpending - analysisData.lastMonthSpending;
+  const changePercent = analysisData.lastMonthSpending > 0
+    ? ((monthlyChange / analysisData.lastMonthSpending) * 100).toFixed(1)
+    : 0;
 
   return {
-    summary: `You've spent $${analysisData.totalExpenses.toFixed(2)} across ${
+    summary: `You've spent ₹${analysisData.totalExpenses.toFixed(2)} across ${
       analysisData.transactionCount
     } transactions. ${
       monthlyChange >= 0 ? "Your spending increased" : "Your spending decreased"
     } by ${Math.abs(changePercent)}% compared to last month.`,
     patterns: [
       `Your top spending category is ${analysisData.topCategory}`,
-      `Average transaction amount is ₹${analysisData.averageTransaction?.toFixed(
-        2
-      ) || "0.00"}`,
+      `Average transaction amount is ₹${analysisData.averageTransaction?.toFixed(2) || "0.00"}`,
       monthlyChange > 0
         ? "Spending increased this month"
         : "Spending decreased this month",
@@ -49,12 +45,9 @@ function generateFallbackInsights(analysisData) {
       "Set up automatic transfers to your savings account",
       "Use the envelope method for discretionary spending categories",
     ],
-    concerns:
-      monthlyChange > analysisData.lastMonthSpending * 0.2
-        ? [
-            "Significant increase in spending this month - review recent purchases",
-          ]
-        : [],
+    concerns: monthlyChange > analysisData.lastMonthSpending * 0.2
+      ? ["Significant increase in spending this month - review recent purchases"]
+      : [],
   };
 }
 
