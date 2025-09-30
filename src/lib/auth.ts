@@ -1,11 +1,12 @@
-// src/lib/auth.ts - JWT-based approach
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./db";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
@@ -19,115 +20,95 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error("Invalid credentials");
         }
 
-        try {
-          // Check for demo account
-          if (
-            credentials.email === "demo@example.com" &&
-            credentials.password === "demo"
-          ) {
-            // Find or create demo user
-            let demoUser = await prisma.user.findUnique({
-              where: { email: "demo@example.com" },
-            });
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+          include: { accounts: true },
+        });
 
-            if (!demoUser) {
-              demoUser = await prisma.user.create({
-                data: {
-                  email: "demo@example.com",
-                  name: "Demo User",
-                  image: null,
-                },
-              });
-            }
+        if (!user) throw new Error("No user found with this email");
 
-            return {
-              id: demoUser.id,
-              email: demoUser.email,
-              name: demoUser.name,
-              image: demoUser.image,
-            };
-          }
-
-          // Check for regular users with hashed passwords
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
-
-          if (user && user.password) {
-            const isPasswordValid = await bcrypt.compare(
-              credentials.password,
-              user.password
-            );
-
-            if (isPasswordValid) {
-              return {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                image: user.image,
-              };
-            }
-          }
-
-          return null;
-        } catch (error) {
-          console.error("Auth error:", error);
-          return null;
+        const hasGoogleAccount = user.accounts.some(
+          (acc) => acc.provider === "google"
+        );
+        if (hasGoogleAccount && !user.password) {
+          throw new Error("Please sign in with Google");
         }
+
+        if (!user.password) throw new Error("Invalid credentials");
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+        if (!isPasswordValid) throw new Error("Invalid password");
+
+        return { id: user.id, email: user.email, name: user.name, image: user.image };
       },
     }),
   ],
   callbacks: {
-    jwt: async ({ token, user, account }) => {
-      if (user) {
-        token.id = user.id;
-      }
-      
-      // Handle Google sign-in users
-      if (account?.provider === "google" && token.email && !token.id) {
+    async signIn({ user, account }) {
+      if (account?.provider === "google" && user.email) {
         try {
-          let dbUser = await prisma.user.findUnique({
-            where: { email: token.email as string },
+          // Link Google account if not already linked
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email },
+            include: { accounts: true },
           });
 
-          if (!dbUser) {
-            dbUser = await prisma.user.create({
-              data: {
-                email: token.email as string,
-                name: token.name as string,
-                image: token.picture as string,
-              },
-            });
-          }
+          if (dbUser) {
+            const googleAccountExists = dbUser.accounts.some(
+              (acc) => acc.provider === "google"
+            );
 
-          token.id = dbUser.id;
+            if (!googleAccountExists) {
+              await prisma.account.create({
+                data: {
+                  userId: dbUser.id,
+                  provider: "google",
+                  providerAccountId: account.providerAccountId,
+                  type: "oauth",
+                  access_token: account.access_token!,
+                  token_type: account.token_type!,
+                  scope: account.scope!,
+                  id_token: account.id_token!,
+                  expires_at: account.expires_at!,
+                },
+              });
+            }
+          }
         } catch (error) {
-          console.error("Error creating user:", error);
+          console.error("Error linking Google account:", error);
+          return false;
         }
       }
+      return true;
+    },
 
+    async jwt({ token, user }) {
+      if (user) token.id = user.id;
       return token;
     },
-    session: async ({ session, token }) => {
-      if (token && session.user) {
-        session.user.id = token.id as string;
-      }
+
+    async session({ session, token }) {
+      if (session.user && token.id) session.user.id = token.id as string;
       return session;
     },
-    redirect: async ({ url, baseUrl }) => {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      if (new URL(url).origin === baseUrl) return url;
+
+    async redirect({ url, baseUrl }) {
+      // Always redirect to dashboard after login
       return `${baseUrl}/dashboard`;
     },
   },
-  session: {
-    strategy: "jwt",
-  },
   pages: {
     signIn: "/sign-in",
+    error: "/sign-in",
+  },
+  session: {
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

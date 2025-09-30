@@ -227,7 +227,8 @@ export default function Dashboard() {
           </h1>
           <div className="flex items-center gap-4">
             <p className="text-slate-600">
-              Here&apos;s your financial overview for {format(today, "MMMM yyyy")}
+              Here&apos;s your financial overview for{" "}
+              {format(today, "MMMM yyyy")}
             </p>
             <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full">
               <AchievementIcon className={`w-4 h-4 ${achievement.color}`} />
@@ -271,8 +272,8 @@ export default function Dashboard() {
                 Monthly Tracking Goal 🎯
               </h3>
               <p className="text-blue-700 text-sm">
-                You&apos;ve logged {currentProgress} out of {monthlyGoal} expenses
-                this month
+                You&apos;ve logged {currentProgress} out of {monthlyGoal}{" "}
+                expenses this month
               </p>
             </div>
             <div className="text-right">
@@ -376,8 +377,9 @@ export default function Dashboard() {
                   Your expense history will appear here
                 </h3>
                 <p className="text-slate-600 mb-6">
-                  Once you add expenses, you&apos;ll see your recent transactions,
-                  spending patterns, and detailed analytics right here.
+                  Once you add expenses, you&apos;ll see your recent
+                  transactions, spending patterns, and detailed analytics right
+                  here.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
                   <Link href="/add-expense">
@@ -397,140 +399,179 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-6">
-  {/* Enhanced Quick Actions */}
-  <div className="glass-card p-6 rounded-xl border border-white/30 shadow-lg backdrop-blur-sm">
-    <h3 className="font-bold text-slate-900 mb-5 flex items-center gap-2">
-      <div className="p-1.5 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-lg">
-        <Zap className="w-5 h-5 text-yellow-600" />
-      </div>
-      Quick Actions
-    </h3>
-    <div className="space-y-3">
-      <Link href="/add-expense" className="block">
-        <Button
-          variant="outline"
-          className="w-full justify-between group border-2 border-emerald-200 hover:border-emerald-300 bg-gradient-to-r from-emerald-50/50 to-blue-50/50 hover:from-emerald-100/80 hover:to-blue-100/80 transition-all duration-300 p-4 h-auto"
-        >
-          <div className="flex items-center justify-between"><div className="flex items-center">
-            <div className="p-1.5 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
-              <PlusCircle className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-300" />
-            </div>
-            <div className="text-left">
-              <div className="font-semibold text-slate-800">Add New Expense</div>
-              <div className="text-xs text-slate-500">Track your spending</div>
-            </div>
-          </div>
-          <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-1 transition-transform duration-200" />
-          </div>
-        </Button>
-      </Link>
-      
-      <Link href="/analytics" className="block">
-        <Button
-          variant="outline"
-          className="w-full justify-between group border-2 border-purple-200 hover:border-purple-300 bg-gradient-to-r from-purple-50/50 to-blue-50/50 hover:from-purple-100/80 hover:to-blue-100/80 transition-all duration-300 p-4 h-auto"
-        >
-          <div className="flex items-center justify-between"><div className="flex items-center">
-            <div className="p-1.5 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
-              <TrendingUp className="w-4 h-4 text-white" />
-            </div>
-            <div className="text-left">
-              <div className="font-semibold text-slate-800">View Analytics</div>
-              <div className="text-xs text-slate-500">Insights & trends</div>
-            </div>
-          </div>
-          <ArrowRight className="w-4 h-4 text-purple-600 group-hover:translate-x-1 transition-transform duration-200" />
-          </div>
-        </Button>
-      </Link>
-    </div>
-  </div>
+          {/* Enhanced Quick Actions */}
+          <div className="glass-card p-6 rounded-xl border border-white/30 shadow-lg backdrop-blur-sm">
+            <h3 className="font-bold text-slate-900 mb-5 flex items-center gap-2">
+              <div className="p-1.5 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-lg">
+                <Zap className="w-5 h-5 text-yellow-600" />
+              </div>
+              Quick Actions
+            </h3>
+            <div className="space-y-3">
+              <Link href="/add-expense" className="block">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between group border-2 border-emerald-200 hover:border-emerald-300 bg-gradient-to-r from-emerald-50/50 to-blue-50/50 hover:from-emerald-100/80 hover:to-blue-100/80 transition-all duration-300 p-4 h-auto flex items-center"
+                >
+                  {/* Left side: icon + text */}
+                  <div className="flex items-center">
+                    <div className="p-1.5 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
+                      <PlusCircle className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-300" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-slate-800">
+                        Add New Expense
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        Track your spending
+                      </div>
+                    </div>
+                  </div>
 
-  {/* Enhanced Tips Section */}
-  <div className="glass-card p-6 rounded-xl border border-white/30 shadow-lg backdrop-blur-sm">
-    <h3 className="font-bold text-slate-900 mb-5 flex items-center gap-2">
-      <div className="p-1.5 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
-        <Target className="w-5 h-5 text-blue-600" />
-      </div>
-      {expenses.length === 0 ? "Getting Started Tips" : "Pro Tips"}
-    </h3>
-    
-    <div className="space-y-4">
-      {expenses.length === 0 ? (
-        <>
-          <div className="flex items-start space-x-4 p-3 rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-100/50">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-              <span className="text-white font-bold text-sm">1</span>
-            </div>
-            <div>
-              <p className="font-medium text-slate-800 mb-1">Start with daily expenses</p>
-              <p className="text-sm text-slate-600">Add coffee, lunch, transport costs to build the habit</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-4 p-3 rounded-xl bg-gradient-to-r from-green-50/80 to-emerald-50/80 border border-green-100/50">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-              <span className="text-white font-bold text-sm">2</span>
-            </div>
-            <div>
-              <p className="font-medium text-slate-800 mb-1">Use categories wisely</p>
-              <p className="text-sm text-slate-600">Organize expenses to understand spending patterns</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-4 p-3 rounded-xl bg-gradient-to-r from-purple-50/80 to-violet-50/80 border border-purple-100/50">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-              <span className="text-white font-bold text-sm">3</span>
-            </div>
-            <div>
-              <p className="font-medium text-slate-800 mb-1">Check your analytics</p>
-              <p className="text-sm text-slate-600">Review insights after adding several expenses</p>
+                  {/* Right side: arrow */}
+                  <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-1 transition-transform duration-200" />
+                </Button>
+              </Link>
+
+              <Link href="/analytics" className="block">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between group border-2 border-purple-200 hover:border-purple-300 bg-gradient-to-r from-purple-50/50 to-blue-50/50 hover:from-purple-100/80 hover:to-blue-100/80 transition-all duration-300 p-4 h-auto flex items-center"
+                >
+                  {/* Left side: icon + text */}
+                  <div className="flex items-center">
+                    <div className="p-1.5 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
+                      <TrendingUp className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-slate-800">
+                        View Analytics
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        Insights & trends
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right side: arrow */}
+                  <ArrowRight className="w-4 h-4 text-purple-600 group-hover:translate-x-1 transition-transform duration-200" />
+                </Button>
+              </Link>
             </div>
           </div>
-        </>
-      ) : (
-        <>
-          <div className="flex items-start space-x-3 p-3 rounded-xl bg-gradient-to-r from-blue-50/60 to-indigo-50/60 border border-blue-100/40">
-            <div className="w-3 h-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
-            <div>
-              <p className="font-medium text-slate-800">Daily tracking habit</p>
-              <p className="text-sm text-slate-600">Add expenses daily for accurate insights</p>
+
+          {/* Enhanced Tips Section */}
+          <div className="glass-card p-6 rounded-xl border border-white/30 shadow-lg backdrop-blur-sm">
+            <h3 className="font-bold text-slate-900 mb-5 flex items-center gap-2">
+              <div className="p-1.5 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
+                <Target className="w-5 h-5 text-blue-600" />
+              </div>
+              {expenses.length === 0 ? "Getting Started Tips" : "Pro Tips"}
+            </h3>
+
+            <div className="space-y-4">
+              {expenses.length === 0 ? (
+                <>
+                  <div className="flex items-start space-x-4 p-3 rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-100/50">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <span className="text-white font-bold text-sm">1</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-800 mb-1">
+                        Start with daily expenses
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        Add coffee, lunch, transport costs to build the habit
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-4 p-3 rounded-xl bg-gradient-to-r from-green-50/80 to-emerald-50/80 border border-green-100/50">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <span className="text-white font-bold text-sm">2</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-800 mb-1">
+                        Use categories wisely
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        Organize expenses to understand spending patterns
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-4 p-3 rounded-xl bg-gradient-to-r from-purple-50/80 to-violet-50/80 border border-purple-100/50">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <span className="text-white font-bold text-sm">3</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-800 mb-1">
+                        Check your analytics
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        Review insights after adding several expenses
+                      </p>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-start space-x-3 p-3 rounded-xl bg-gradient-to-r from-blue-50/60 to-indigo-50/60 border border-blue-100/40">
+                    <div className="w-3 h-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
+                    <div>
+                      <p className="font-medium text-slate-800">
+                        Daily tracking habit
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        Add expenses daily for accurate insights
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50/60 to-emerald-50/60 border border-green-100/40">
+                    <div className="w-3 h-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
+                    <div>
+                      <p className="font-medium text-slate-800">
+                        AI-powered insights
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        Use AI analysis for personalized advice
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3 p-3 rounded-xl bg-gradient-to-r from-purple-50/60 to-violet-50/60 border border-purple-100/40">
+                    <div className="w-3 h-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
+                    <div>
+                      <p className="font-medium text-slate-800">
+                        Monthly goal setting
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        Set and track spending targets
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
+
+            {/* Progress indicator for new users */}
+            {expenses.length === 0 && (
+              <div className="mt-5 pt-4 border-t border-slate-200/50">
+                <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+                  <span>Getting started</span>
+                  <span>0/3 steps</span>
+                </div>
+                <div className="w-full bg-slate-200/50 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                    style={{ width: "0%" }}
+                  ></div>
+                </div>
+              </div>
+            )}
           </div>
-          
-          <div className="flex items-start space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50/60 to-emerald-50/60 border border-green-100/40">
-            <div className="w-3 h-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
-            <div>
-              <p className="font-medium text-slate-800">AI-powered insights</p>
-              <p className="text-sm text-slate-600">Use AI analysis for personalized advice</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3 p-3 rounded-xl bg-gradient-to-r from-purple-50/60 to-violet-50/60 border border-purple-100/40">
-            <div className="w-3 h-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
-            <div>
-              <p className="font-medium text-slate-800">Monthly goal setting</p>
-              <p className="text-sm text-slate-600">Set and track spending targets</p>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-    
-    {/* Progress indicator for new users */}
-    {expenses.length === 0 && (
-      <div className="mt-5 pt-4 border-t border-slate-200/50">
-        <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
-          <span>Getting started</span>
-          <span>0/3 steps</span>
         </div>
-        <div className="w-full bg-slate-200/50 rounded-full h-2">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500" style={{width: '0%'}}></div>
-        </div>
-      </div>
-    )}
-  </div>
-</div>
       </div>
     </div>
   );

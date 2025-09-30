@@ -34,6 +34,7 @@ import {
 } from "recharts";
 import { format, subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { formatCurrency } from "@/lib/utils";
+import { generateFinancialInsights } from "@/lib/insightsGenerator";
 
 const CATEGORY_COLORS = {
   FOOD: "#FF6B6B",
@@ -72,8 +73,8 @@ export default function Analytics() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [generatingInsights, setGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState(null);
+  const [generatingInsights, setGeneratingInsights] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -109,66 +110,79 @@ export default function Analytics() {
     }
   }, [status, router]);
 
-  const generateAIInsights = async () => {
+  // const generateAIInsights = async () => {
+  //   if (expenses.length === 0) return;
+
+  //   setGeneratingInsights(true);
+  //   try {
+  //     // Prepare expense data for AI analysis
+  //     const totalSpent = expenses.reduce(
+  //       (sum, exp) => sum + (exp.amount || 0),
+  //       0
+  //     );
+  //     const categoryBreakdown = categoryData.map((cat) => ({
+  //       category: cat.category,
+  //       amount: cat.amount,
+  //       percentage: ((cat.amount / totalSpent) * 100).toFixed(1),
+  //     }));
+
+  //     const recentExpenses = expenses
+  //       .sort((a, b) => new Date(b.date) - new Date(a.date))
+  //       .slice(0, 10)
+  //       .map((exp) => ({
+  //         title: exp.title,
+  //         amount: exp.amount,
+  //         category: exp.category,
+  //         date: exp.date,
+  //       }));
+
+  //     const analysisData = {
+  //       totalExpenses: totalSpent,
+  //       transactionCount: expenses.length,
+  //       thisMonthSpending: thisMonthTotal,
+  //       lastMonthSpending: lastMonthTotal,
+  //       categoryBreakdown,
+  //       recentExpenses,
+  //       averageTransaction: totalSpent / expenses.length,
+  //       topCategory: categoryData[0]?.category || "None",
+  //     };
+
+  //     const response = await fetch("/api/ai-insights", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(analysisData),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to generate AI insights");
+  //     }
+
+  //     const insights = await response.json();
+  //     setAiInsights(insights);
+  //   } catch (error) {
+  //     console.error("Error generating AI insights:", error);
+  //     // Set a fallback message
+  //     setAiInsights({
+  //       error:
+  //         "Unable to generate insights at this time. Please try again later.",
+  //     });
+  //   }
+  //   setGeneratingInsights(false);
+  // };
+
+  const generateInsights = () => {
     if (expenses.length === 0) return;
 
     setGeneratingInsights(true);
-    try {
-      // Prepare expense data for AI analysis
-      const totalSpent = expenses.reduce(
-        (sum, exp) => sum + (exp.amount || 0),
-        0
-      );
-      const categoryBreakdown = categoryData.map((cat) => ({
-        category: cat.category,
-        amount: cat.amount,
-        percentage: ((cat.amount / totalSpent) * 100).toFixed(1),
-      }));
 
-      const recentExpenses = expenses
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 10)
-        .map((exp) => ({
-          title: exp.title,
-          amount: exp.amount,
-          category: exp.category,
-          date: exp.date,
-        }));
-
-      const analysisData = {
-        totalExpenses: totalSpent,
-        transactionCount: expenses.length,
-        thisMonthSpending: thisMonthTotal,
-        lastMonthSpending: lastMonthTotal,
-        categoryBreakdown,
-        recentExpenses,
-        averageTransaction: totalSpent / expenses.length,
-        topCategory: categoryData[0]?.category || "None",
-      };
-
-      const response = await fetch("/api/ai-insights", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(analysisData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to generate AI insights");
-      }
-
-      const insights = await response.json();
+    // Simulate a brief loading state for better UX
+    setTimeout(() => {
+      const insights = generateFinancialInsights(expenses);
       setAiInsights(insights);
-    } catch (error) {
-      console.error("Error generating AI insights:", error);
-      // Set a fallback message
-      setAiInsights({
-        error:
-          "Unable to generate insights at this time. Please try again later.",
-      });
-    }
-    setGeneratingInsights(false);
+      setGeneratingInsights(false);
+    }, 800);
   };
 
   if (status === "loading" || loading) {
@@ -295,7 +309,7 @@ export default function Analytics() {
 
           {expenses.length > 0 && (
             <Button
-              onClick={generateAIInsights}
+              onClick={generateInsights}
               disabled={generatingInsights}
               className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
             >
@@ -307,7 +321,7 @@ export default function Analytics() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Brain className="w-4 h-4" />
-                  Get AI Insights
+                  Generate Insights
                 </div>
               )}
             </Button>
@@ -451,7 +465,7 @@ export default function Analytics() {
                   </p>
                   {expenses.length > 0 ? (
                     <Button
-                      onClick={generateAIInsights}
+                      onClick={generateInsights}
                       disabled={generatingInsights}
                       className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white"
                     >
@@ -489,7 +503,7 @@ export default function Analytics() {
                   </h3>
                   <p className="text-slate-600 mb-6">{aiInsights.error}</p>
                   <Button
-                    onClick={generateAIInsights}
+                    onClick={generateInsights}
                     disabled={generatingInsights}
                     variant="outline"
                   >
@@ -678,7 +692,7 @@ export default function Analytics() {
                           </ResponsiveContainer>
                         </div>
                       </CardContent>
-                    </Card> 
+                    </Card>
 
                     {/* Category Pie Chart */}
                     <Card className="glass-card">

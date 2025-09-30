@@ -7,7 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, EyeOff, Mail, Lock, User, Wallet, Chrome, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Wallet,
+  Chrome,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function SignInPage() {
@@ -24,23 +34,23 @@ export default function SignInPage() {
   // Form validation
   const validateForm = (isSignUp = false) => {
     const errors = {};
-    
+
     if (!email) {
       errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       errors.email = "Please enter a valid email";
     }
-    
+
     if (!password) {
       errors.password = "Password is required";
     } else if (isSignUp && password.length < 6) {
       errors.password = "Password must be at least 6 characters";
     }
-    
+
     if (isSignUp && !name.trim()) {
       errors.name = "Name is required";
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -48,7 +58,7 @@ export default function SignInPage() {
   const handleSignIn = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     setError("");
 
@@ -56,12 +66,22 @@ export default function SignInPage() {
       const result = await signIn("credentials", {
         email,
         password,
-        callbackUrl: "/dashboard",
         redirect: false,
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        // Show specific error messages
+        if (result.error.includes("Google")) {
+          setError(
+            "This email is registered with Google. Please use 'Continue with Google'"
+          );
+        } else if (result.error.includes("No user found")) {
+          setError("No account found with this email. Please sign up first.");
+        } else if (result.error.includes("Invalid password")) {
+          setError("Incorrect password. Please try again.");
+        } else {
+          setError("Invalid email or password");
+        }
         return;
       }
 
@@ -77,7 +97,7 @@ export default function SignInPage() {
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (!validateForm(true)) return;
-    
+
     setIsLoading(true);
     setError("");
 
@@ -161,15 +181,19 @@ export default function SignInPage() {
           </div>
 
           {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-6"
+          >
             <TabsList className="grid grid-cols-2 w-full bg-slate-100/80 p-1">
-              <TabsTrigger 
-                value="sign-in" 
+              <TabsTrigger
+                value="sign-in"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-200"
               >
                 Sign In
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="sign-up"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-200"
               >
@@ -188,7 +212,10 @@ export default function SignInPage() {
                   className="space-y-4"
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email" className="text-sm font-medium text-slate-700">
+                    <Label
+                      htmlFor="signin-email"
+                      className="text-sm font-medium text-slate-700"
+                    >
                       Email Address
                     </Label>
                     <div className="relative">
@@ -200,12 +227,17 @@ export default function SignInPage() {
                         onChange={(e) => {
                           setEmail(e.target.value);
                           if (validationErrors.email) {
-                            setValidationErrors(prev => ({ ...prev, email: undefined }));
+                            setValidationErrors((prev) => ({
+                              ...prev,
+                              email: undefined,
+                            }));
                           }
                         }}
                         placeholder="Enter your email"
                         className={`pl-10 bg-white/80 border-slate-200 focus:border-blue-500 transition-colors ${
-                          validationErrors.email ? 'border-red-300 focus:border-red-500' : ''
+                          validationErrors.email
+                            ? "border-red-300 focus:border-red-500"
+                            : ""
                         }`}
                         disabled={isLoading}
                       />
@@ -222,7 +254,7 @@ export default function SignInPage() {
                     {validationErrors.email && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: "auto" }}
                         className="text-red-500 text-xs mt-1"
                       >
                         {validationErrors.email}
@@ -231,7 +263,10 @@ export default function SignInPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password" className="text-sm font-medium text-slate-700">
+                    <Label
+                      htmlFor="signin-password"
+                      className="text-sm font-medium text-slate-700"
+                    >
                       Password
                     </Label>
                     <div className="relative">
@@ -243,12 +278,17 @@ export default function SignInPage() {
                         onChange={(e) => {
                           setPassword(e.target.value);
                           if (validationErrors.password) {
-                            setValidationErrors(prev => ({ ...prev, password: undefined }));
+                            setValidationErrors((prev) => ({
+                              ...prev,
+                              password: undefined,
+                            }));
                           }
                         }}
                         placeholder="Enter your password"
                         className={`pl-10 pr-10 bg-white/80 border-slate-200 focus:border-blue-500 transition-colors ${
-                          validationErrors.password ? 'border-red-300 focus:border-red-500' : ''
+                          validationErrors.password
+                            ? "border-red-300 focus:border-red-500"
+                            : ""
                         }`}
                         disabled={isLoading}
                       />
@@ -257,13 +297,17 @@ export default function SignInPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                     {validationErrors.password && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: "auto" }}
                         className="text-red-500 text-xs mt-1"
                       >
                         {validationErrors.password}
@@ -309,7 +353,10 @@ export default function SignInPage() {
                   className="space-y-4"
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name" className="text-sm font-medium text-slate-700">
+                    <Label
+                      htmlFor="signup-name"
+                      className="text-sm font-medium text-slate-700"
+                    >
                       Full Name
                     </Label>
                     <div className="relative">
@@ -321,12 +368,17 @@ export default function SignInPage() {
                         onChange={(e) => {
                           setName(e.target.value);
                           if (validationErrors.name) {
-                            setValidationErrors(prev => ({ ...prev, name: undefined }));
+                            setValidationErrors((prev) => ({
+                              ...prev,
+                              name: undefined,
+                            }));
                           }
                         }}
                         placeholder="Enter your full name"
                         className={`pl-10 bg-white/80 border-slate-200 focus:border-blue-500 transition-colors ${
-                          validationErrors.name ? 'border-red-300 focus:border-red-500' : ''
+                          validationErrors.name
+                            ? "border-red-300 focus:border-red-500"
+                            : ""
                         }`}
                         disabled={isLoading}
                       />
@@ -334,7 +386,7 @@ export default function SignInPage() {
                     {validationErrors.name && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: "auto" }}
                         className="text-red-500 text-xs mt-1"
                       >
                         {validationErrors.name}
@@ -343,7 +395,10 @@ export default function SignInPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-sm font-medium text-slate-700">
+                    <Label
+                      htmlFor="signup-email"
+                      className="text-sm font-medium text-slate-700"
+                    >
                       Email Address
                     </Label>
                     <div className="relative">
@@ -355,12 +410,17 @@ export default function SignInPage() {
                         onChange={(e) => {
                           setEmail(e.target.value);
                           if (validationErrors.email) {
-                            setValidationErrors(prev => ({ ...prev, email: undefined }));
+                            setValidationErrors((prev) => ({
+                              ...prev,
+                              email: undefined,
+                            }));
                           }
                         }}
                         placeholder="Enter your email"
                         className={`pl-10 bg-white/80 border-slate-200 focus:border-blue-500 transition-colors ${
-                          validationErrors.email ? 'border-red-300 focus:border-red-500' : ''
+                          validationErrors.email
+                            ? "border-red-300 focus:border-red-500"
+                            : ""
                         }`}
                         disabled={isLoading}
                       />
@@ -368,7 +428,7 @@ export default function SignInPage() {
                     {validationErrors.email && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: "auto" }}
                         className="text-red-500 text-xs mt-1"
                       >
                         {validationErrors.email}
@@ -377,7 +437,10 @@ export default function SignInPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-sm font-medium text-slate-700">
+                    <Label
+                      htmlFor="signup-password"
+                      className="text-sm font-medium text-slate-700"
+                    >
                       Password
                     </Label>
                     <div className="relative">
@@ -389,12 +452,17 @@ export default function SignInPage() {
                         onChange={(e) => {
                           setPassword(e.target.value);
                           if (validationErrors.password) {
-                            setValidationErrors(prev => ({ ...prev, password: undefined }));
+                            setValidationErrors((prev) => ({
+                              ...prev,
+                              password: undefined,
+                            }));
                           }
                         }}
                         placeholder="Create a secure password"
                         className={`pl-10 pr-10 bg-white/80 border-slate-200 focus:border-blue-500 transition-colors ${
-                          validationErrors.password ? 'border-red-300 focus:border-red-500' : ''
+                          validationErrors.password
+                            ? "border-red-300 focus:border-red-500"
+                            : ""
                         }`}
                         disabled={isLoading}
                       />
@@ -403,13 +471,17 @@ export default function SignInPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                     {validationErrors.password && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: "auto" }}
                         className="text-red-500 text-xs mt-1"
                       >
                         {validationErrors.password}
@@ -417,7 +489,12 @@ export default function SignInPage() {
                     )}
                     {password && password.length > 0 && (
                       <div className="text-xs text-slate-500 mt-1">
-                        Password strength: {password.length < 6 ? 'Weak' : password.length < 10 ? 'Good' : 'Strong'}
+                        Password strength:{" "}
+                        {password.length < 6
+                          ? "Weak"
+                          : password.length < 10
+                          ? "Good"
+                          : "Strong"}
                       </div>
                     )}
                   </div>
@@ -458,7 +535,9 @@ export default function SignInPage() {
               <span className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-slate-500 font-medium">Or continue with</span>
+              <span className="bg-white px-4 text-slate-500 font-medium">
+                Or continue with
+              </span>
             </div>
           </div>
 

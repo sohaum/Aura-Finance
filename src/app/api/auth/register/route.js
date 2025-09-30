@@ -16,11 +16,27 @@ export async function POST(req) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
+      include: { accounts: true }  // Check if they have OAuth accounts
     });
 
     if (existingUser) {
-      return new Response(JSON.stringify({ message: "User with this email already exists" }), {
+      // Check if user signed up with Google
+      const hasGoogleAccount = existingUser.accounts.some(acc => acc.provider === 'google');
+      
+      if (hasGoogleAccount) {
+        return new Response(JSON.stringify({ 
+          message: "An account with this email already exists. Please sign in with Google." 
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
+      // User exists with email/password
+      return new Response(JSON.stringify({ 
+        message: "User with this email already exists" 
+      }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -38,7 +54,6 @@ export async function POST(req) {
       },
     });
 
-    // Return success (don't return password hash)
     return new Response(JSON.stringify({ 
       message: "Account created successfully",
       user: {
