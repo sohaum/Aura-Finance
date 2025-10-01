@@ -21,26 +21,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import DemoModal from "@/components/Demo/DemoModal";
 
-// Dynamically import DemoModal to avoid SSR issues
-// const DemoModal = dynamic(() => import("@/components/Demo/DemoModal"), { 
-//   ssr: false,
-//   loading: () => <div>Loading...</div>
-// });
-
-// const TestModal = ({ isOpen, onClose }) => {
-//   if (!isOpen) return null;
-//   return (
-//     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-//       <div className="bg-white p-6 rounded-lg">
-//         <h2>Test Modal Working!</h2>
-//         <button onClick={onClose} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-//           Close
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
 const features = [
   {
     icon: Wallet,
@@ -362,7 +342,7 @@ export default function LandingPageClient() {
               </span>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-600">
-              <span>© 2024 AuraFinance. All rights reserved.</span>
+              <span>© 2025 AuraFinance. All rights reserved.</span>
               <div className="flex gap-4">
                 <button className="hover:text-slate-900 transition-colors">
                   Privacy
