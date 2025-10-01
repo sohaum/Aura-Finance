@@ -58,7 +58,7 @@ export default function RecentExpenses({ expenses }) {
           <CardTitle className="text-slate-900 font-bold">Recent Expenses</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 max-h-80 overflow-y-auto">
+          <div className="space-y-4 max-h-[33rem] overflow-y-auto">
             <AnimatePresence>
               {expenses.map((expense, index) => {
                 const IconComponent = categoryIcons[expense.category] || Receipt;
